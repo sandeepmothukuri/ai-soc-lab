@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install flake8 black isort
+          pip install -r ai-engine/requirements.txt
+
+      - name: Lint with flake8
+        run: flake8 ai-engine/ --max-line-length=100 --ignore=E501,W503
+
+      - name: Check formatting
+        run: black --check ai-engine/
+
+  validate-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Docker Compose files
+        run: |
+          for f in docker/docker-compose.*.yml; do
+            echo "Validating $f..."
+            docker-compose -f "$f" config -q && echo "  OK" || exit 1
+          done
+
+  validate-configs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate JSON configs
+        run: |
+          python3 -m json.tool thehive-config/case-templates.json > /dev/null
+          python3 -m json.tool shuffle-workflows/ssh-bruteforce.json > /dev/null
+          python3 -m json.tool shuffle-workflows/malware-detection.json > /dev/null
+          echo "All JSON configs valid"
+
+      - name: Validate XML rules
+        run: |
+          python3 -c "
+          import xml.etree.ElementTree as ET
+          ET.parse('wazuh-config/custom-rules.xml')
+          print('Wazuh rules XML valid')
+          "

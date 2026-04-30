@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  misp-db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=misp
+      - MYSQL_USER=misp
+      - MYSQL_PASSWORD=misp_password
+      - MYSQL_ROOT_PASSWORD=root_password
+    volumes:
+      - misp-db-data:/var/lib/mysql
+    networks:
+      - soc-network
+
+  misp-redis:
+    image: redis:7
+    restart: unless-stopped
+    networks:
+      - soc-network
+
+  misp:
+    image: ghcr.io/misp/misp-docker/misp-core:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "8443:443"
+    depends_on:
+      - misp-db
+      - misp-redis
+    environment:
+      - MISP_BASEURL=http://localhost:8080
+      - MYSQL_HOST=misp-db
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=misp
+      - MYSQL_USER=misp
+      - MYSQL_PASSWORD=misp_password
+      - REDIS_HOST=misp-redis
+      - REDIS_PORT=6379
+      - MISP_ADMIN_EMAIL=admin@admin.test
+      - MISP_ADMIN_PASSPHRASE=admin
+      - MISP_ORG=SOC-Lab
+      - GPG_PASSPHRASE=passphrase
+    volumes:
+      - misp-data:/var/www/MISP/app/files
+      - misp-tmp:/tmp/misp_tmp
+    networks:
+      - soc-network
+
+volumes:
+  misp-db-data:
+  misp-data:
+  misp-tmp:
+
+networks:
+  soc-network:
+    external: true

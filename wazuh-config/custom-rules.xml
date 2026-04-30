@@ -1,0 +1,100 @@
+<!-- Custom Wazuh rules for AI-SOC Lab -->
+<group name="ai-soc,custom">
+
+  <!-- SSH Brute Force with successful login -->
+  <rule id="100001" level="13">
+    <if_matched_group>authentication_failed</if_matched_group>
+    <same_source_ip />
+    <occurrence>5</occurrence>
+    <timeframe>120</timeframe>
+    <description>SSH brute force attack detected: multiple failures then success</description>
+    <group>brute_force,ssh,high_priority</group>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+  </rule>
+
+  <!-- Privilege Escalation via sudo -->
+  <rule id="100002" level="12">
+    <if_group>sudo</if_group>
+    <match>NOT in sudoers</match>
+    <description>Unauthorized sudo attempt - potential privilege escalation</description>
+    <group>privilege_escalation,high_priority</group>
+    <mitre>
+      <id>T1068</id>
+    </mitre>
+  </rule>
+
+  <!-- Web shell detection -->
+  <rule id="100003" level="14">
+    <if_group>web</if_group>
+    <regex type="pcre2">(?i)(cmd\.exe|powershell|/bin/sh|/bin/bash|passthru|shell_exec|system\(|exec\()</regex>
+    <description>Possible web shell execution detected</description>
+    <group>web_shell,high_priority</group>
+    <mitre>
+      <id>T1505.003</id>
+    </mitre>
+  </rule>
+
+  <!-- Suspicious outbound connection volume -->
+  <rule id="100004" level="10">
+    <if_group>firewall</if_group>
+    <same_source_ip />
+    <occurrence>100</occurrence>
+    <timeframe>60</timeframe>
+    <description>High volume outbound connections - potential C2 or data exfiltration</description>
+    <group>exfiltration,c2</group>
+    <mitre>
+      <id>T1041</id>
+    </mitre>
+  </rule>
+
+  <!-- New user creation outside business hours -->
+  <rule id="100005" level="11">
+    <if_group>useradd</if_group>
+    <time>22:00 - 06:00</time>
+    <description>User account created outside business hours</description>
+    <group>persistence,after_hours</group>
+    <mitre>
+      <id>T1136</id>
+    </mitre>
+  </rule>
+
+  <!-- Ransomware indicators - mass file modification -->
+  <rule id="100006" level="15">
+    <if_group>syscheck</if_group>
+    <same_field>file.path</same_field>
+    <occurrence>50</occurrence>
+    <timeframe>30</timeframe>
+    <regex type="pcre2">(?i)\.(encrypted|locked|ransom|cry|crypto)$</regex>
+    <description>CRITICAL: Ransomware activity detected - mass file encryption</description>
+    <group>ransomware,critical</group>
+    <mitre>
+      <id>T1486</id>
+    </mitre>
+  </rule>
+
+  <!-- Pass-the-hash / NTLM relay -->
+  <rule id="100007" level="12">
+    <if_group>windows,authentication</if_group>
+    <match>LogonType: 3</match>
+    <match>AuthenticationPackageName: NTLM</match>
+    <description>NTLM network logon detected - possible pass-the-hash attack</description>
+    <group>credential_theft,lateral_movement</group>
+    <mitre>
+      <id>T1550.002</id>
+    </mitre>
+  </rule>
+
+  <!-- DNS query anomaly -->
+  <rule id="100008" level="9">
+    <decoded_as>zeek</decoded_as>
+    <field name="dns.query_length" type="pcre2">[4-9]\d|[1-9]\d{2,}</field>
+    <description>Abnormally long DNS query - possible DNS tunneling</description>
+    <group>dns_tunneling,exfiltration</group>
+    <mitre>
+      <id>T1071.004</id>
+    </mitre>
+  </rule>
+
+</group>

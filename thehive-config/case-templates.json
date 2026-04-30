@@ -1,0 +1,137 @@
+[
+  {
+    "name": "AI-SOC: Brute Force Attack",
+    "titlePrefix": "[BF]",
+    "description": "Template for brute force / credential stuffing incidents detected by AI SOC engine",
+    "severity": 2,
+    "tags": ["brute-force", "credential-attack", "ai-detected"],
+    "tlp": 2,
+    "tasks": [
+      {
+        "title": "Verify source IP in threat intelligence",
+        "description": "Check IP in MISP, VirusTotal, AbuseIPDB. Document findings.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Determine if login was successful",
+        "description": "Review auth logs for success event following failures. Check for new sessions.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Identify affected accounts",
+        "description": "List all accounts targeted. Identify any compromised accounts.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Block source IP",
+        "description": "Block at firewall and/or WAF. Document IP and block timestamp.",
+        "group": "Containment"
+      },
+      {
+        "title": "Reset compromised credentials",
+        "description": "Force password reset for affected accounts. Invalidate active sessions.",
+        "group": "Containment"
+      },
+      {
+        "title": "Enable MFA if not already active",
+        "description": "Enforce MFA on affected accounts. Document if MFA was bypassed.",
+        "group": "Hardening"
+      },
+      {
+        "title": "Write incident report",
+        "description": "Document timeline, IOCs, impact, and actions taken.",
+        "group": "Closure"
+      }
+    ]
+  },
+  {
+    "name": "AI-SOC: Malware / Ransomware",
+    "titlePrefix": "[MLW]",
+    "description": "Template for malware detection incidents",
+    "severity": 3,
+    "tags": ["malware", "ransomware", "endpoint", "ai-detected"],
+    "tlp": 2,
+    "tasks": [
+      {
+        "title": "Isolate affected host",
+        "description": "Immediately isolate host from network. Use Wazuh active-response or manual firewall rule.",
+        "group": "Containment"
+      },
+      {
+        "title": "Collect forensic artifacts",
+        "description": "Memory dump, running processes, network connections, prefetch files, event logs.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Identify malware family",
+        "description": "Submit hash to VirusTotal, Any.run, Hybrid Analysis. Check MISP for known campaign.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Determine infection vector",
+        "description": "Trace how malware entered: email, web download, lateral movement, removable media.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Scan for lateral spread",
+        "description": "Check for similar indicators on adjacent systems. Review network logs for spread.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Eradicate malware",
+        "description": "Remove malware, persistence mechanisms, and any backdoors. Verify clean.",
+        "group": "Eradication"
+      },
+      {
+        "title": "Restore from clean backup",
+        "description": "Verify backup integrity. Restore if needed. Validate restored system.",
+        "group": "Recovery"
+      },
+      {
+        "title": "Add IOCs to MISP",
+        "description": "Share file hashes, IPs, domains, and YARA rules with threat intel platform.",
+        "group": "Closure"
+      }
+    ]
+  },
+  {
+    "name": "AI-SOC: Data Exfiltration",
+    "titlePrefix": "[EXFIL]",
+    "description": "Template for suspected data exfiltration incidents",
+    "severity": 3,
+    "tags": ["exfiltration", "data-breach", "ai-detected"],
+    "tlp": 3,
+    "tasks": [
+      {
+        "title": "Block outbound channel",
+        "description": "Block destination IP/domain. If DNS tunneling, sinkhole or block resolver.",
+        "group": "Containment"
+      },
+      {
+        "title": "Quantify data transferred",
+        "description": "Calculate volume and estimate what data was exfiltrated. Review Zeek/netflow.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Identify data classification",
+        "description": "Determine if PII, financial, IP, or regulated data was involved.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Identify internal source",
+        "description": "Trace which user/process initiated the transfer. Review endpoint logs.",
+        "group": "Investigation"
+      },
+      {
+        "title": "Legal and compliance notification",
+        "description": "If regulated data involved, notify legal/compliance team. Check breach notification requirements.",
+        "group": "Escalation"
+      },
+      {
+        "title": "Preserve evidence chain",
+        "description": "Ensure all logs are preserved and chain of custody documented for potential legal action.",
+        "group": "Closure"
+      }
+    ]
+  }
+]

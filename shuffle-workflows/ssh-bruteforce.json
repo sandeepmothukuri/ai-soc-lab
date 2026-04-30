@@ -1,0 +1,77 @@
+{
+  "name": "SSH Brute Force → AI Triage → TheHive",
+  "description": "Triggered by Wazuh SSH brute force alert. Enriches with MISP, sends to AI Engine, creates TheHive case.",
+  "triggers": [
+    {
+      "name": "Wazuh Webhook",
+      "type": "WEBHOOK",
+      "parameters": {
+        "filter": "rule.id == '5712' OR rule.groups CONTAINS 'brute_force'"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "parse_alert",
+      "name": "Parse Wazuh Alert",
+      "app": "Shuffle Tools",
+      "action": "execute_python",
+      "parameters": {
+        "code": "import json\nalert = execution_argument\nreturn {\n  'alert_id': alert.get('id', 'unknown'),\n  'source_ip': alert.get('data', {}).get('srcip', ''),\n  'hostname': alert.get('agent', {}).get('name', ''),\n  'rule_description': alert.get('rule', {}).get('description', ''),\n  'severity': alert.get('rule', {}).get('level', 5)\n}"
+      }
+    },
+    {
+      "id": "misp_lookup",
+      "name": "MISP IP Lookup",
+      "app": "MISP",
+      "action": "search_ioc",
+      "parameters": {
+        "value": "$parse_alert.source_ip",
+        "type": "ip-src"
+      }
+    },
+    {
+      "id": "ai_triage",
+      "name": "AI Engine Triage",
+      "app": "HTTP",
+      "action": "POST",
+      "parameters": {
+        "url": "http://ai-engine:8888/analyze",
+        "headers": {"Content-Type": "application/json"},
+        "body": {
+          "alert_id": "$parse_alert.alert_id",
+          "source": "wazuh",
+          "rule_description": "$parse_alert.rule_description",
+          "severity": "$parse_alert.severity",
+          "source_ip": "$parse_alert.source_ip",
+          "hostname": "$parse_alert.hostname",
+          "timestamp": "$exec.timestamp",
+          "raw_log": "$exec.raw",
+          "misp_context": "$misp_lookup"
+        }
+      }
+    },
+    {
+      "id": "check_verdict",
+      "name": "Check AI Verdict",
+      "app": "Shuffle Tools",
+      "action": "filter",
+      "parameters": {
+        "field": "$ai_triage.verdict",
+        "check": "not equal",
+        "value": "CLOSE"
+      }
+    },
+    {
+      "id": "notify_slack",
+      "name": "Notify Slack",
+      "app": "Slack",
+      "action": "post_message",
+      "parameters": {
+        "channel": "#soc-alerts",
+        "message": ":rotating_light: *AI SOC Alert*\nVerdict: $ai_triage.verdict\nSeverity: $ai_triage.severity_normalized\nHost: $parse_alert.hostname\nSource IP: $parse_alert.source_ip\nMITRE: $ai_triage.mitre_technique\n\n$ai_triage.summary"
+      },
+      "requires": "check_verdict"
+    }
+  ]
+}

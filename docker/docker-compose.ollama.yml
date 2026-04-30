@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    hostname: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+    # Uncomment for GPU support (NVIDIA):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    networks:
+      - soc-network
+
+  ai-engine:
+    build:
+      context: ../ai-engine
+      dockerfile: Dockerfile
+    hostname: ai-engine
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - THEHIVE_URL=http://thehive:9000
+      - THEHIVE_API_KEY=your_thehive_api_key
+      - MODEL_NAME=llama3
+      - LOG_LEVEL=INFO
+    depends_on:
+      - ollama
+    networks:
+      - soc-network
+
+volumes:
+  ollama-models:
+
+networks:
+  soc-network:
+    external: true

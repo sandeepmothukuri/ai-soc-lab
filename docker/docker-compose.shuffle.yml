@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  shuffle-frontend:
+    image: ghcr.io/shuffle/shuffle-frontend:latest
+    hostname: shuffle-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+      - "3443:443"
+    environment:
+      - BACKEND_HOSTNAME=shuffle-backend
+    depends_on:
+      - shuffle-backend
+    networks:
+      - soc-network
+
+  shuffle-backend:
+    image: ghcr.io/shuffle/shuffle-backend:latest
+    hostname: shuffle-backend
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - shuffle-data:/shuffle-database
+    environment:
+      - DATASTORE_EMULATOR_HOST=shuffle-database:8000
+      - SHUFFLE_APP_HOTLOAD_FOLDER=./shuffle-apps
+      - SHUFFLE_FILE_LOCATION=./files
+      - SHUFFLE_OPENSEARCH_URL=http://opensearch:9200
+      - SHUFFLE_DEFAULT_USERNAME=admin
+      - SHUFFLE_DEFAULT_PASSWORD=password
+      - SHUFFLE_DEFAULT_APIKEY=mysupersecretkey
+      - BASE_URL=http://shuffle-backend:5001
+    depends_on:
+      - opensearch
+    networks:
+      - soc-network
+
+  shuffle-orborus:
+    image: ghcr.io/shuffle/shuffle-orborus:latest
+    hostname: shuffle-orborus
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - SHUFFLE_APP_SDK_VERSION=latest
+      - SHUFFLE_WORKER_VERSION=latest
+      - ORG_ID=Shuffle
+      - SHUFFLE_EXECUTION_TIMEOUT=600
+      - SHUFFLE_BASE_URL=http://shuffle-backend:5001
+      - SHUFFLE_DOCKER_API_VERSION=1.40
+    depends_on:
+      - shuffle-backend
+    networks:
+      - soc-network
+
+  opensearch:
+    image: opensearchproject/opensearch:2.5.0
+    hostname: opensearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms1024m -Xmx1024m"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+    ports:
+      - "9202:9200"
+    networks:
+      - soc-network
+
+  shuffle-database:
+    image: google/cloud-sdk
+    hostname: shuffle-database
+    restart: unless-stopped
+    command: gcloud beta emulators datastore start --project=shuffle --host-port=0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    networks:
+      - soc-network
+
+volumes:
+  shuffle-data:
+  opensearch-data:
+
+networks:
+  soc-network:
+    external: true

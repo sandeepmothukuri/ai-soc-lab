@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+*.egg
+
+# Environment files
+.env
+.env.local
+*.env
+
+# Docker volumes (generated)
+docker-volumes/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# API keys / secrets (never commit)
+secrets/
+*.key
+*.pem
+*.crt

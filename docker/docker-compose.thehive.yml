@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  cassandra:
+    image: cassandra:4.1
+    hostname: cassandra
+    restart: unless-stopped
+    environment:
+      - CASSANDRA_CLUSTER_NAME=thehive
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    networks:
+      - soc-network
+
+  elasticsearch:
+    image: elasticsearch:7.17.12
+    hostname: elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - soc-network
+
+  thehive:
+    image: strangebee/thehive:5.2
+    hostname: thehive
+    restart: unless-stopped
+    depends_on:
+      - cassandra
+      - elasticsearch
+    ports:
+      - "9000:9000"
+    environment:
+      - JVM_OPTS="-Xms512m -Xmx1g"
+    volumes:
+      - thehive-data:/opt/thp/thehive/data
+      - ../thehive-config/case-templates.json:/opt/thp/thehive/conf/case-templates.json
+    command:
+      - --secret
+      - "SuperSecretForTheHive"
+      - "--cql-hostnames"
+      - "cassandra"
+      - "--index-backend"
+      - "elasticsearch"
+      - "--es-hostnames"
+      - "elasticsearch"
+    networks:
+      - soc-network
+
+  cortex:
+    image: thehiveproject/cortex:3.1.7
+    hostname: cortex
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    depends_on:
+      - elasticsearch
+    environment:
+      - job_directory=/opt/cortex/jobs
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - cortex-data:/var/log/cortex
+    networks:
+      - soc-network
+
+volumes:
+  cassandra-data:
+  elasticsearch-data:
+  thehive-data:
+  cortex-data:
+
+networks:
+  soc-network:
+    external: true

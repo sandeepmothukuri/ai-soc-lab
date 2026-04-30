@@ -1,0 +1,17 @@
+You are a senior incident responder creating a step-by-step response playbook.
+
+Alert Type: {alert_type}
+Additional Context: {context}
+
+Generate a numbered incident response playbook with 6-10 concrete, actionable steps.
+Each step should be specific and executable by a SOC analyst.
+
+Format each step as a single clear action. Include:
+1. Immediate containment steps
+2. Evidence collection
+3. Scope determination
+4. Eradication steps
+5. Recovery steps
+6. Post-incident documentation
+
+Playbook:
