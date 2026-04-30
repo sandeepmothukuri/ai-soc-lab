@@ -5,7 +5,6 @@ Core alert analysis logic using LangChain + Ollama.
 import os
 import json
 import re
-import time
 import logging
 from pathlib import Path
 from langchain_community.llms import Ollama
@@ -168,8 +167,8 @@ class AlertAnalyzer:
 
     async def generate_playbook(self, alert_type: str, context: str = "") -> list[str]:
         raw = self.playbook_chain.run(alert_type=alert_type, context=context or "No additional context")
-        lines = [l.strip() for l in raw.strip().split("\n") if l.strip()]
-        steps = [re.sub(r"^\d+[\.\)]\s*", "", l) for l in lines if l]
+        lines = [line.strip() for line in raw.strip().split("\n") if line.strip()]
+        steps = [re.sub(r"^\d+[\.\)]\s*", "", line) for line in lines if line]
         return steps[:10]
 
     async def nl_to_dsl(self, question: str) -> dict:

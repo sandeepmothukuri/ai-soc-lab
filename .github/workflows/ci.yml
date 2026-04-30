@@ -37,7 +37,7 @@ jobs:
         run: |
           for f in docker/docker-compose.*.yml; do
             echo "Validating $f..."
-            docker-compose -f "$f" config -q && echo "  OK" || exit 1
+            docker compose -f "$f" config -q && echo "  OK" || exit 1
           done
 
   validate-configs:

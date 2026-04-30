@@ -4,7 +4,6 @@ Receives alert data, runs LLM analysis, returns structured triage output.
 """
 
 import os
-import json
 import logging
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, BackgroundTasks
