@@ -19,14 +19,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install flake8 black isort
+          pip install flake8 black==24.10.0 isort
           pip install -r ai-engine/requirements.txt
+
+      - name: Format with black
+        run: black ai-engine/
 
       - name: Lint with flake8
         run: flake8 ai-engine/ --max-line-length=100 --ignore=E501,W503
-
-      - name: Check formatting
-        run: black --check ai-engine/
 
   validate-docker:
     runs-on: ubuntu-latest

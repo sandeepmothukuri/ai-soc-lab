@@ -132,9 +132,7 @@ class AlertAnalyzer:
     async def analyze(self, alert: dict) -> dict:
         self._stats["analyzed"] += 1
         alert_str = json.dumps(alert, indent=2)
-        mitre_tactic, mitre_technique = self._map_mitre(
-            alert.get("rule_description", "")
-        )
+        mitre_tactic, mitre_technique = self._map_mitre(alert.get("rule_description", ""))
         severity_normalized = self._normalize_severity(alert.get("severity", 5))
 
         try:
@@ -161,9 +159,7 @@ class AlertAnalyzer:
                 "mitre_tactic": mitre_tactic,
                 "mitre_technique": mitre_technique,
                 "summary": summary_raw.strip(),
-                "response_recommendation": triage.get(
-                    "reasoning", "Review alert manually."
-                ),
+                "response_recommendation": triage.get("reasoning", "Review alert manually."),
                 "playbook_steps": playbook,
                 "analyst_notes": (
                     f"AI model: {self.model_name} | "
