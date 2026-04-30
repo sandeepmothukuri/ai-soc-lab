@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="AI SOC Engine",
     description="LLM-powered alert triage and analysis for open-source SOC",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 app.add_middleware(
@@ -35,10 +35,10 @@ hive_client = TheHiveClient()
 
 class AlertPayload(BaseModel):
     alert_id: str
-    source: str                     # wazuh | suricata | zeek
+    source: str  # wazuh | suricata | zeek
     rule_id: Optional[str] = None
     rule_description: str
-    severity: int                   # 1-15 (Wazuh scale)
+    severity: int  # 1-15 (Wazuh scale)
     source_ip: Optional[str] = None
     dest_ip: Optional[str] = None
     hostname: Optional[str] = None
@@ -50,9 +50,9 @@ class AlertPayload(BaseModel):
 
 class TriageResult(BaseModel):
     alert_id: str
-    verdict: str                    # CLOSE | ESCALATE | ENRICH
-    confidence: float               # 0.0 - 1.0
-    severity_normalized: str        # LOW | MEDIUM | HIGH | CRITICAL
+    verdict: str  # CLOSE | ESCALATE | ENRICH
+    confidence: float  # 0.0 - 1.0
+    severity_normalized: str  # LOW | MEDIUM | HIGH | CRITICAL
     mitre_tactic: Optional[str]
     mitre_technique: Optional[str]
     summary: str
@@ -115,4 +115,5 @@ async def stats():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8888)

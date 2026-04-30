@@ -18,11 +18,20 @@ PROMPT_DIR = Path(__file__).parent / "prompts"
 MITRE_PATTERNS = {
     "brute force": ("TA0006 - Credential Access", "T1110 - Brute Force"),
     "port scan": ("TA0007 - Discovery", "T1046 - Network Service Scanning"),
-    "sql injection": ("TA0001 - Initial Access", "T1190 - Exploit Public-Facing Application"),
+    "sql injection": (
+        "TA0001 - Initial Access",
+        "T1190 - Exploit Public-Facing Application",
+    ),
     "xss": ("TA0001 - Initial Access", "T1190 - Exploit Public-Facing Application"),
-    "privilege escalation": ("TA0004 - Privilege Escalation", "T1068 - Exploitation for Privilege Escalation"),
+    "privilege escalation": (
+        "TA0004 - Privilege Escalation",
+        "T1068 - Exploitation for Privilege Escalation",
+    ),
     "lateral movement": ("TA0008 - Lateral Movement", "T1021 - Remote Services"),
-    "exfiltration": ("TA0010 - Exfiltration", "T1048 - Exfiltration Over Alternative Protocol"),
+    "exfiltration": (
+        "TA0010 - Exfiltration",
+        "T1048 - Exfiltration Over Alternative Protocol",
+    ),
     "malware": ("TA0002 - Execution", "T1204 - User Execution"),
     "ransomware": ("TA0040 - Impact", "T1486 - Data Encrypted for Impact"),
     "c2": ("TA0011 - Command and Control", "T1071 - Application Layer Protocol"),
@@ -41,7 +50,7 @@ class AlertAnalyzer:
         self.llm = Ollama(
             model=self.model_name,
             base_url=self.ollama_host,
-            temperature=0.1,        # low temperature = consistent, deterministic output
+            temperature=0.1,  # low temperature = consistent, deterministic output
         )
 
         self.triage_prompt = PromptTemplate(
@@ -123,7 +132,9 @@ class AlertAnalyzer:
     async def analyze(self, alert: dict) -> dict:
         self._stats["analyzed"] += 1
         alert_str = json.dumps(alert, indent=2)
-        mitre_tactic, mitre_technique = self._map_mitre(alert.get("rule_description", ""))
+        mitre_tactic, mitre_technique = self._map_mitre(
+            alert.get("rule_description", "")
+        )
         severity_normalized = self._normalize_severity(alert.get("severity", 5))
 
         try:
@@ -140,7 +151,7 @@ class AlertAnalyzer:
 
             playbook = await self.generate_playbook(
                 alert.get("rule_description", "security incident"),
-                f"Source IP: {alert.get('source_ip')}, Severity: {severity_normalized}"
+                f"Source IP: {alert.get('source_ip')}, Severity: {severity_normalized}",
             )
 
             return {
@@ -150,7 +161,9 @@ class AlertAnalyzer:
                 "mitre_tactic": mitre_tactic,
                 "mitre_technique": mitre_technique,
                 "summary": summary_raw.strip(),
-                "response_recommendation": triage.get("reasoning", "Review alert manually."),
+                "response_recommendation": triage.get(
+                    "reasoning", "Review alert manually."
+                ),
                 "playbook_steps": playbook,
                 "analyst_notes": (
                     f"AI model: {self.model_name} | "
@@ -166,7 +179,9 @@ class AlertAnalyzer:
             raise
 
     async def generate_playbook(self, alert_type: str, context: str = "") -> list[str]:
-        raw = self.playbook_chain.run(alert_type=alert_type, context=context or "No additional context")
+        raw = self.playbook_chain.run(
+            alert_type=alert_type, context=context or "No additional context"
+        )
         lines = [line.strip() for line in raw.strip().split("\n") if line.strip()]
         steps = [re.sub(r"^\d+[\.\)]\s*", "", line) for line in lines if line]
         return steps[:10]

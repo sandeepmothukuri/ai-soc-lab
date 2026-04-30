@@ -55,7 +55,9 @@ class TheHiveClient:
                 )
                 resp.raise_for_status()
                 case = resp.json()
-                logger.info(f"TheHive case created: {case.get('_id')} for alert {alert.get('alert_id')}")
+                logger.info(
+                    f"TheHive case created: {case.get('_id')} for alert {alert.get('alert_id')}"
+                )
                 return case
         except Exception as e:
             logger.error(f"TheHive case creation failed: {e}")
