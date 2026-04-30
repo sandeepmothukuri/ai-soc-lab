@@ -1,5 +1,7 @@
 # 🧠 AI-Augmented SOC Lab
 
+[![CI](https://github.com/sandeepmothukuri/ai-soc-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/sandeepmothukuri/ai-soc-lab/actions) [![Website](https://img.shields.io/badge/Website-cybertechnology.in-blue)](https://cybertechnology.in) [![MITRE ATT&CK](https://img.shields.io/badge/MITRE-ATT%26CK-red)](https://attack.mitre.org/)
+
 A full open-source Security Operations Center (SOC) lab enhanced with a local AI decision-support layer. Built for learning, research, and practical blue-team skill development.
 
 ---
@@ -275,7 +277,9 @@ Pull requests welcome. See [docs/setup-guide.md](docs/setup-guide.md) to get sta
 
 **Sandeep Mothukuri**
 - GitHub: [@sandeepmothukuri](https://github.com/sandeepmothukuri)
-- Portfolio: [github.com/sandeepmothukuri](https://github.com/sandeepmothukuri)
+- Website: [cybertechnology.in](https://cybertechnology.in)
+- LinkedIn: [linkedin.com/in/sandeepmothukuris](https://www.linkedin.com/in/sandeepmothukuris)
+- Email: sandeep.mothukuris@gmail.com
 
 ---
 
