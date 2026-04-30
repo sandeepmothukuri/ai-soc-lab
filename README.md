@@ -52,6 +52,78 @@ Logs / Events
 
 ---
 
+## 📸 Screenshots
+
+### Wazuh SIEM — Security Operations Dashboard
+> Central hub for all security events, agent status, and compliance across your environment.
+
+![Wazuh Security Operations Dashboard](docs/screenshots/wazuh-dashboard.png)
+
+---
+
+### Wazuh — Endpoint Security View
+> Per-agent telemetry including vulnerability detection, FIM, and active threats.
+
+![Wazuh Endpoint Security](docs/screenshots/wazuh-endpoint-security.png)
+
+---
+
+### Wazuh — Threat Intelligence Panel
+> Correlates alerts against known threat intel feeds and MITRE ATT&CK techniques.
+
+![Wazuh Threat Intelligence](docs/screenshots/wazuh-threat-intel.png)
+
+---
+
+### TheHive — Enriched Case Management
+> Each AI-triaged alert auto-creates a structured case with playbook tasks and IOCs.
+
+![TheHive Case Management](docs/screenshots/thehive-case-management.png)
+
+---
+
+### TheHive — Centralized Alert Management
+> All incoming alerts from Wazuh/Suricata are queued, prioritized, and assigned here.
+
+![TheHive Alert Management](docs/screenshots/thehive-alert-management.png)
+
+---
+
+### TheHive + Cortex — Automated Analysis & Response
+> Cortex analyzers enrich alerts with VirusTotal, AbuseIPDB, and passive DNS lookups.
+
+![TheHive Cortex Response](docs/screenshots/thehive-cortex-response.png)
+
+---
+
+### Shuffle SOAR — Workflow Automation
+> Drag-and-drop workflow connects Wazuh webhooks → MISP enrichment → AI Engine → TheHive case creation.
+
+![Shuffle SOAR Workflow](docs/screenshots/shuffle-workflow.png)
+
+---
+
+### MISP — Live Threat Intelligence Dashboard
+> Real-time IOC feeds, event correlations, and threat actor tracking from the community.
+
+![MISP Live Dashboard](docs/screenshots/misp-dashboard.png)
+
+---
+
+### MISP — Trending Threat Indicators
+> Tracks rising IOCs, malware families, and attack patterns across sharing communities.
+
+![MISP Trending Indicators](docs/screenshots/misp-trendings.png)
+
+---
+
+### Ollama — Local LLM Interface (Open WebUI)
+> Privacy-safe local AI model running LLaMA 3 / Mistral — no data leaves your network.
+
+![Ollama Open WebUI](docs/screenshots/ollama-openwebui.png)
+
+---
+
 ## ⚙️ AI Use Cases
 
 ### 1. Alert Summarization
@@ -83,7 +155,7 @@ Ask questions in plain English and get Elasticsearch DSL queries back.
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ai-soc-lab.git
+git clone https://github.com/sandeepmothukuri/ai-soc-lab.git
 cd ai-soc-lab
 ```
 
@@ -149,8 +221,8 @@ ai-soc-lab/
 └── docs/                      # Extended documentation
     ├── setup-guide.md
     ├── ai-prompts.md
-    ├── shuffle-workflows.md
-    └── mitre-mapping.md
+    ├── mitre-mapping.md
+    └── screenshots/           # All UI screenshots
 ```
 
 ---
